@@ -17,7 +17,7 @@ import java.net.*;
  * access to your local network to anybody in the world. One should never use
  * this authentication scheme unless one have pretty good reason to do so. There
  * is a couple of other authentication schemes in socks.server package.
- * 
+ *
  * @see ServerAuthenticator
  */
 public class ProxyServer implements Runnable {
@@ -42,8 +42,8 @@ public class ProxyServer implements Runnable {
 	private Thread pipe_thread1, pipe_thread2;
 	private long lastReadTime;
 
-	private  static int iddleTimeout = 180000; // 3 minutes
-	private  static int acceptTimeout = 180000; // 3 minutes
+	private int iddleTimeout = 180000; // 3 minutes
+	private int acceptTimeout = 180000; // 3 minutes
 
 	private static Logger log = LoggerFactory.getLogger(ProxyServer.class);
 	private static SocksProxyBase proxy;
@@ -53,7 +53,7 @@ public class ProxyServer implements Runnable {
 
 	/**
 	 * Creates a proxy server with given Authentication scheme.
-	 * 
+	 *
 	 * @param auth
 	 *            Authentication scheme to be used.
 	 */
@@ -64,7 +64,7 @@ public class ProxyServer implements Runnable {
 	// Other constructors
 	// //////////////////
 
-	ProxyServer(final ServerAuthenticator auth, final Socket s) {
+	protected ProxyServer(final ServerAuthenticator auth, final Socket s) {
 		this.auth = auth;
 		this.sock = s;
 		this.mode = START_MODE;
@@ -80,7 +80,7 @@ public class ProxyServer implements Runnable {
 	 * and so on. If proxy supports SOCKSv4, then only some SOCKSv5 requests can
 	 * be handled, UDP would not work, however CONNECT and BIND will be
 	 * translated.
-	 * 
+	 *
 	 * @param p
 	 *            Proxy which should be used to handle user requests.
 	 */
@@ -92,7 +92,7 @@ public class ProxyServer implements Runnable {
 
 	/**
 	 * Get proxy.
-	 * 
+	 *
 	 * @return Proxy wich is used to handle user requests.
 	 */
 	public static SocksProxyBase getProxy() {
@@ -105,7 +105,7 @@ public class ProxyServer implements Runnable {
 	 * Zero timeout implies infinity.<br>
 	 * Default timeout is 3 minutes.
 	 */
-	public static void setIddleTimeout(final int timeout) {
+	public void setIddleTimeout(final int timeout) {
 		iddleTimeout = timeout;
 	}
 
@@ -115,7 +115,7 @@ public class ProxyServer implements Runnable {
 	 * Zero timeout implies infinity.<br>
 	 * Default timeout is 3 minutes.
 	 */
-	public static void setAcceptTimeout(final int timeout) {
+	public void setAcceptTimeout(final int timeout) {
 		acceptTimeout = timeout;
 	}
 
@@ -168,13 +168,21 @@ public class ProxyServer implements Runnable {
 				final int port2 = s.getPort();
 				log.info("Accepted from:{}:{}", hostName, port2);
 
-				final ProxyServer ps = new ProxyServer(auth, s);
+				final ProxyServer ps = newInstance(auth, s);
 				(new Thread(ps)).start();
 			}
-		} catch (final IOException ioe) {
-			ioe.printStackTrace();
+		} catch (final SocketException se) {
+			if (!"Socket closed".equals(se.getMessage())) {
+				se.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
 		}
+	}
+
+	protected ProxyServer newInstance(ServerAuthenticator auth, Socket socket){
+        return new ProxyServer(auth, socket);
 	}
 
 	/**
@@ -329,18 +337,13 @@ public class ProxyServer implements Runnable {
 		sendErrorMessage(error_code);
 	}
 
-	private void onConnect(final ProxyMessage msg) throws IOException {
-		Socket s;
 
-		if (proxy == null) {
-			s = new Socket(msg.ip, msg.port);
-		} else {
-			s = new SocksSocket(proxy, msg.ip, msg.port);
-		}
+	private void onConnect(final ProxyMessage msg) throws IOException {
+		Socket s = createSocket();
 
 		log.info("Connected to " + s.getInetAddress() + ":" + s.getPort());
 
-		ProxyMessage response = null;
+		ProxyMessage response;
 		final InetAddress localAddress = s.getLocalAddress();
 		final int localPort = s.getLocalPort();
 
@@ -354,6 +357,19 @@ public class ProxyServer implements Runnable {
 		}
 		response.write(out);
 		startPipe(s);
+	}
+
+    /**
+     * @return socket connected to target
+     * if chained proxy is set then theined proxy, otherwise connect directly to target
+     * @throws IOException
+     */
+	protected Socket createSocket() throws IOException {
+		if (proxy == null) {
+			return new Socket(msg.ip, msg.port);
+		} else {
+			return new SocksSocket(proxy, msg.ip, msg.port);
+		}
 	}
 
 	private void onBind(final ProxyMessage msg) throws IOException {

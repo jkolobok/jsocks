@@ -144,28 +144,28 @@ public class SOCKS {
 	 * Does server initialisation.
 	 */
 	static void serverInit(Properties props) {
-		int val;
-		val = readInt(props, "iddleTimeout");
-		if (val >= 0) {
-			ProxyServer.setIddleTimeout(val);
-			inform("Setting iddle timeout to " + val + " ms.");
-		}
-		val = readInt(props, "acceptTimeout");
-		if (val >= 0) {
-			ProxyServer.setAcceptTimeout(val);
-			inform("Setting accept timeout to " + val + " ms.");
-		}
-		val = readInt(props, "udpTimeout");
-		if (val >= 0) {
-			ProxyServer.setUDPTimeout(val);
-			inform("Setting udp timeout to " + val + " ms.");
-		}
-
-		val = readInt(props, "datagramSize");
-		if (val >= 0) {
-			ProxyServer.setDatagramSize(val);
-			inform("Setting datagram size to " + val + " bytes.");
-		}
+//		int val;
+//		val = readInt(props, "iddleTimeout");
+//		if (val >= 0) {
+//			ProxyServer.setIddleTimeout(val);
+//			inform("Setting iddle timeout to " + val + " ms.");
+//		}
+//		val = readInt(props, "acceptTimeout");
+//		if (val >= 0) {
+//			ProxyServer.setAcceptTimeout(val);
+//			inform("Setting accept timeout to " + val + " ms.");
+//		}
+//		val = readInt(props, "udpTimeout");
+//		if (val >= 0) {
+//			ProxyServer.setUDPTimeout(val);
+//			inform("Setting udp timeout to " + val + " ms.");
+//		}
+//
+//		val = readInt(props, "datagramSize");
+//		if (val >= 0) {
+//			ProxyServer.setDatagramSize(val);
+//			inform("Setting datagram size to " + val + " bytes.");
+//		}
 
 		proxyInit(props);
 
