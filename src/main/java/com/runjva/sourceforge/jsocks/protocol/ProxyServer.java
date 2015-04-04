@@ -46,7 +46,7 @@ public class ProxyServer implements Runnable {
 	private int acceptTimeout = 180000; // 3 minutes
 
 	private static Logger log = LoggerFactory.getLogger(ProxyServer.class);
-	private static SocksProxyBase proxy;
+	private SocksProxyBase proxy;
 
 	// Public Constructors
 	// ///////////////////
@@ -64,9 +64,10 @@ public class ProxyServer implements Runnable {
 	// Other constructors
 	// //////////////////
 
-	protected ProxyServer(final ServerAuthenticator auth, final Socket s) {
+	protected ProxyServer(final ServerAuthenticator auth, final Socket s,SocksProxyBase proxy) {
 		this.auth = auth;
 		this.sock = s;
+		this.proxy = proxy;
 		this.mode = START_MODE;
 	}
 
@@ -84,10 +85,10 @@ public class ProxyServer implements Runnable {
 	 * @param p
 	 *            Proxy which should be used to handle user requests.
 	 */
-	public static void setProxy(final SocksProxyBase p) {
+	public void setProxy(final SocksProxyBase p) {
 		proxy = p;
-		// FIXME: Side effect.
-		UDPRelayServer.proxy = proxy;
+//		 FIXME: Side effect.
+//		UDPRelayServer.proxy = proxy;
 	}
 
 	/**
@@ -95,7 +96,7 @@ public class ProxyServer implements Runnable {
 	 *
 	 * @return Proxy wich is used to handle user requests.
 	 */
-	public static SocksProxyBase getProxy() {
+	public SocksProxyBase getProxy() {
 		return proxy;
 	}
 
@@ -182,7 +183,7 @@ public class ProxyServer implements Runnable {
 	}
 
 	protected ProxyServer newInstance(ServerAuthenticator auth, Socket socket){
-        return new ProxyServer(auth, socket);
+        return new ProxyServer(auth, socket, proxy);
 	}
 
 	/**
@@ -366,7 +367,9 @@ public class ProxyServer implements Runnable {
      */
 	protected Socket createSocket() throws IOException {
 		if (proxy == null) {
-			return new Socket(msg.ip, msg.port);
+			final Socket socket = new Socket(Proxy.NO_PROXY);
+			socket.connect(new InetSocketAddress(msg.ip, msg.port));
+			return socket;
 		} else {
 			return new SocksSocket(proxy, msg.ip, msg.port);
 		}

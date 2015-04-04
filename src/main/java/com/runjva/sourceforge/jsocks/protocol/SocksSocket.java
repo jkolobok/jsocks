@@ -161,7 +161,7 @@ public class SocksSocket extends Socket {
 		this.proxy = p.copy();
 		this.remoteIP = ip;
 		this.remotePort = port;
-		this.remoteHost = ip.getHostName();
+		this.remoteHost = ip.getHostAddress();
 		if (proxy.isDirect(remoteIP)) {
 			doDirect();
 		} else {
@@ -187,7 +187,7 @@ public class SocksSocket extends Socket {
 		this.proxy = proxy;
 		this.localIP = proxy.proxySocket.getLocalAddress();
 		this.localPort = proxy.proxySocket.getLocalPort();
-		remoteHost = remoteIP.getHostName();
+		remoteHost = remoteIP.getHostAddress();
 	}
 
 	/**
@@ -364,7 +364,7 @@ public class SocksSocket extends Socket {
 		 */
 		if (reply.host.equals("0.0.0.0")) {
 			localIP = proxy.proxyIP;
-			localHost = localIP.getHostName();
+			localHost = localIP.getHostAddress();
 		} else {
 			localHost = reply.host;
 			localIP = reply.ip;

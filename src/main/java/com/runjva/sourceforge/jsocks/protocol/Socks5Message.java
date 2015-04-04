@@ -51,7 +51,7 @@ class Socks5Message extends ProxyMessage {
 		if (ip == null) {
 			this.host = "0.0.0.0";
 		} else {
-			this.host = ip.getHostName();
+			this.host = ip.getHostAddress();
 		}
 
 		this.version = SOCKS_VERSION;

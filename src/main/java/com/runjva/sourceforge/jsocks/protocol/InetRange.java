@@ -224,13 +224,13 @@ public class InetRange implements Cloneable {
 	 * @return true If host is in the range, false otherwise.
 	 */
 	public synchronized boolean contains(final InetAddress ip) {
-		if (checkHostEnding(ip.getHostName())) {
-			return true;
-		}
-		if (checkHost(ip.getHostName())) {
-			return true;
-		}
-		return contains(ip2long(ip));
+//		if (checkHostEnding(ip.getHostName())) {
+//			return true;
+//		}
+//		if (checkHost(ip.getHostName())) {
+//			return true;
+//		}
+		return false;//contains(ip2long(ip));
 	}
 
 	/**

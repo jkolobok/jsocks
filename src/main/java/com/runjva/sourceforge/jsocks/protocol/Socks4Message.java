@@ -113,7 +113,7 @@ class Socks4Message extends ProxyMessage {
 		final byte[] addr = new byte[4];
 		d_in.readFully(addr);
 		ip = bytes2IP(addr);
-		host = ip.getHostName();
+		host = ip.getHostAddress();
 		if (!clientMode) {
 			int b = in.read();
 			// FIXME: Hope there are no idiots with user name bigger than this

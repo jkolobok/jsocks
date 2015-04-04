@@ -214,7 +214,7 @@ public class SOCKS {
 			proxy.setDirect(ir);
 		}
 
-		ProxyServer.setProxy(proxy);
+		proxy.setChainProxy(proxy);
 	}
 
 	/**
